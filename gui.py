@@ -6,16 +6,17 @@ from ai_player import AIPlayer
 
 root = tk.Tk()
 root.title("Rock-Paper-Scissors AI")
-root.geometry("600x500")
+root.geometry("600x550")
 root.resizable(False, False)
 
 game = RockPaperScissorsGame()
-ai = AIPlayer(difficulty="smart")
+ai = None  
 player_name = ""
 player_total_wins = 0
 ai_total_wins = 0
+selected_difficulty = tk.StringVar(value="easy")
 
-# Helper functions
+#  HELPER FUNCTIONS 
 def show_frame(frame):
     frame.tkraise()
 
@@ -25,7 +26,7 @@ def reset_game_state():
     game.rounds_played = 0
     game.game_history = []
 
-# Start Screen
+#  START SCREEN 
 start_frame = tk.Frame(root, bg="#1f1f2e")
 start_frame.place(relwidth=1, relheight=1)
 
@@ -33,14 +34,42 @@ start_label = tk.Label(start_frame, text="🎮 Rock-Paper-Scissors AI 🎮",
                        font=("Arial", 24, "bold"), fg="white", bg="#1f1f2e")
 start_label.pack(pady=100)
 
-def start_game():
-    show_frame(name_frame)
+def go_to_difficulty():
+    show_frame(difficulty_frame)
 
 start_button = tk.Button(start_frame, text="Start Game", font=("Arial", 16),
-                         bg="#4ecca3", fg="white", width=20, command=start_game)
+                         bg="#4ecca3", fg="white", width=20, command=go_to_difficulty)
 start_button.pack(pady=20)
 
-# Player Name Screen
+#  DIFFICULTY SELECTION SCREEN 
+difficulty_frame = tk.Frame(root, bg="#252836")
+difficulty_frame.place(relwidth=1, relheight=1)
+
+diff_label = tk.Label(difficulty_frame, text="Select AI Difficulty", font=("Arial", 20, "bold"),
+                      fg="white", bg="#252836")
+diff_label.pack(pady=80)
+
+def save_difficulty():
+    global ai
+    difficulty = selected_difficulty.get()
+    ai = AIPlayer(difficulty=difficulty)
+    show_frame(name_frame)
+
+tk.Radiobutton(difficulty_frame, text="Easy AI (Random)", variable=selected_difficulty,
+               value="easy", font=("Arial", 16), bg="#252836", fg="white", selectcolor="#4ecca3").pack(pady=10)
+tk.Radiobutton(difficulty_frame, text="Smart AI (Hard)", variable=selected_difficulty,
+               value="smart", font=("Arial", 16), bg="#252836", fg="white", selectcolor="#f05454").pack(pady=10)
+
+diff_next_btn = tk.Button(difficulty_frame, text="Next", font=("Arial", 14),
+                          bg="#ff8c42", fg="white", width=15, command=save_difficulty)
+diff_next_btn.pack(pady=20)
+
+# Back button to start
+diff_back_btn = tk.Button(difficulty_frame, text="Back", font=("Arial", 12),
+                          bg="#4ecca3", fg="white", width=10, command=lambda: show_frame(start_frame))
+diff_back_btn.pack(pady=10)
+
+#  PLAYER NAME SCREEN 
 name_frame = tk.Frame(root, bg="#272640")
 name_frame.place(relwidth=1, relheight=1)
 
@@ -65,7 +94,13 @@ next_button = tk.Button(name_frame, text="Next", font=("Arial", 14),
                         bg="#ff8c42", fg="white", width=15, command=save_name)
 next_button.pack(pady=20)
 
-# -------------------- GAMEPLAY SCREEN --------------------
+# Back button to difficulty selection
+name_back_btn = tk.Button(name_frame, text="Back", font=("Arial", 12),
+                          bg="#4ecca3", fg="white", width=10,
+                          command=lambda: show_frame(difficulty_frame))
+name_back_btn.pack(pady=10)
+
+#  GAMEPLAY SCREEN 
 game_frame = tk.Frame(root, bg="#1f2430")
 game_frame.place(relwidth=1, relheight=1)
 
@@ -109,7 +144,13 @@ scissors_btn.grid(row=0, column=2, padx=10)
 
 highlight_buttons = {"rock": rock_btn, "paper": paper_btn, "scissors": scissors_btn}
 
-# COUNTDOWN SCREEN 
+# Back button to name
+game_back_btn = tk.Button(game_frame, text="Back", font=("Arial", 12),
+                          bg="#4ecca3", fg="white", width=10,
+                          command=lambda: show_frame(name_frame))
+game_back_btn.pack(pady=10)
+
+#  COUNTDOWN SCREEN 
 countdown_frame = tk.Frame(root, bg="#0d1b2a")
 countdown_frame.place(relwidth=1, relheight=1)
 
@@ -120,7 +161,7 @@ countdown_label.pack(pady=100)
 progress = ttk.Progressbar(countdown_frame, orient="horizontal", length=400, mode="determinate")
 progress.pack(pady=20)
 
-# RESULT SCREEN 
+#  RESULT SCREEN 
 result_frame = tk.Frame(root, bg="#1c1c1c")
 result_frame.place(relwidth=1, relheight=1)
 
@@ -154,7 +195,7 @@ exit_button = tk.Button(result_frame, text="Exit", font=("Arial", 14),
                         bg="#f05454", fg="white", width=15, command=exit_game)
 exit_button.pack()
 
-# GAME LOGIC
+#  GAME LOGIC 
 def start_round():
     global player_total_wins, ai_total_wins
 
@@ -212,6 +253,6 @@ start_round_button = tk.Button(game_frame, text="Start Round", font=("Arial", 14
                                command=start_round)
 start_round_button.pack(pady=20)
 
-# INITIALIZE 
+#  INITIALIZE 
 show_frame(start_frame)
 root.mainloop()
